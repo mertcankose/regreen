@@ -206,7 +206,7 @@ router.post('/user/send-otp-code-again', async (req, res) => {
 
         const toEmail = req.body.email;
         const emailSubject = `OTP Verification`;
-        const emailText = 'Your OTP Code for ReGreen: ${otpGenerated}';
+        const emailText = `Your OTP Code for ReGreen: ${otpGenerated}`;
         sendEmail(toEmail, emailSubject, emailText);
 
         res.status(200).send(successResponse("OK", { otp: user.otp }, res.statusCode))
