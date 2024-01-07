@@ -8,7 +8,6 @@ const bycrypt = require('bcryptjs')
 const multer = require('multer')
 const sharp = require('sharp')
 const { generateOTP } = require('../utils/otp')
-const { sendEmail } = require('../utils/mail_send')
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
