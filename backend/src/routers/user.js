@@ -220,7 +220,13 @@ router.post('/user/send-otp-code', async (req, res) => {
         otpObject.save();
         res.status(200).send(successResponse("OK", { otp: otpGenerated }, res.statusCode))
     } catch (error) {
-        res.status(400).send(errorResponse(error.toString(), res.statusCode))
+        if (error instanceof MongoServerError && error.code === 11000) {
+            // Handle the duplicate key violation error
+            res.status(400).send(errorResponse('Email already exists', res.statusCode));
+        } else {
+            // Handle other errors
+            res.status(400).send(errorResponse(error.toString(), res.statusCode));
+        }
     }
 })
 
@@ -251,7 +257,13 @@ router.post('/user/send-otp-code-again', async (req, res) => {
         const info = await transporter.sendMail(mailOptions);
         res.status(200).send(successResponse("OK", { otp: user.otp }, res.statusCode))
     } catch (error) {
-        res.status(400).send(errorResponse(error.toString(), res.statusCode))
+        if (error instanceof MongoServerError && error.code === 11000) {
+            // Handle the duplicate key violation error
+            res.status(400).send(errorResponse('Email already exists', res.statusCode));
+        } else {
+            // Handle other errors
+            res.status(400).send(errorResponse(error.toString(), res.statusCode));
+        }
     }
 })
 
@@ -304,7 +316,13 @@ router.post('/user/forgot-password', async (req, res) => {
 
         res.status(200).send(successResponse("OK", { otp: user.otp }, res.statusCode));
     } catch (error) {
-        res.status(400).send(errorResponse(error.toString(), res.statusCode));
+        if (error instanceof MongoServerError && error.code === 11000) {
+            // Handle the duplicate key violation error
+            res.status(400).send(errorResponse('Email already exists', res.statusCode));
+        } else {
+            // Handle other errors
+            res.status(400).send(errorResponse(error.toString(), res.statusCode));
+        }
     }
 });
 
