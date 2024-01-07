@@ -68,12 +68,6 @@ const userSchema = new mongoose.Schema({
         timestamps: true
     })
 
-userSchema.virtual('childs', {
-    ref: 'Child',
-    localField: '_id',
-    foreignField: 'parent'
-})
-
 //toJSON proccess every apis without any call
 userSchema.methods.toJSON = function () {
     const user = this

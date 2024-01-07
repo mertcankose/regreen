@@ -1,6 +1,7 @@
 const express = require('express')
 const router = new express.Router()
 const User = require('../models/user')
+const Otp = require('../models/otp')
 const auth = require('../middleware/auth')
 const { successResponse, errorResponse } = require("../utils/response")
 const bycrypt = require('bcryptjs')
@@ -16,6 +17,7 @@ router.post('/user/register', async (req, res) => {
         ...req.body,
         otp: otpGenerated,
         otpExpiration: otpExpiration,
+        active: true
     })
     try {
         const token = await user.generateAuthToken()
@@ -193,13 +195,16 @@ router.post('/user/change-email', auth, async (req, res) => {
 });
 router.post('/user/send-otp-code', async (req, res) => {
     const otpGenerated = generateOTP();
-    const otpExpiration = new Date(Date.now() + 2 * 60 * 1000);
+    const otpObject = new Otp({
+        email: req.body.email,
+        otp: otpGenerated,
+    })
     try {
         const toEmail = req.body.email;
         const emailSubject = `OTP Verification`;
         const emailText = `Your OTP Code for ReGreen: ${otpGenerated}`;
         sendEmail(toEmail, emailSubject, emailText);
-
+        otpObject.save();
         res.status(200).send(successResponse("OK", { otp: otpGenerated }, res.statusCode))
     } catch (error) {
         res.status(400).send(errorResponse(error.toString(), res.statusCode))
@@ -234,26 +239,19 @@ router.post('/user/send-otp-code-again', async (req, res) => {
 
 router.post('/user/validate-otp', async (req, res) => {
     try {
-        const user = await User.findOne({
+        const otpObject = await Otp.findOne({
             email: req.body.email,
         });
 
-        if (!user) {
-            return res.status(400).send(errorResponse("User not found!", res.statusCode));
+        if (!otpObject) {
+            return res.status(400).send(errorResponse("Otp not found!", res.statusCode));
         }
 
-        if (user.otpExpiration && user.otpExpiration < new Date()) {
-            return res.status(400).send(errorResponse("OTP has expired!", res.statusCode));
-        }
-
-        if (user && user.otp !== req.body.otp) {
+        if (otpObject.otp !== req.body.otp) {
             return res.status(400).send(errorResponse("Invalid OTP!", res.statusCode));
         }
 
-        user.active = true;
-        const token = await user.generateAuthToken();
-        await user.save();
-        res.status(200).send(successResponse("OK", { user, token }, res.statusCode));
+        res.status(200).send(successResponse("Successful", res.statusCode));
     } catch (error) {
         res.status(400).send(errorResponse(error.toString(), res.statusCode));
     }
