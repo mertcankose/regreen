@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.log("errrrr:", error);
-      errorMessage("An error occurred while fetching user data");
+      // errorMessage("An error occurred while fetching user data");
     }
   };
 
