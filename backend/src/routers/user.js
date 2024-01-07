@@ -30,7 +30,7 @@ router.post('/user/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         if (!user.active) {
-            res.status(400).send(errorResponse("Please validate your OTP!", res.statusCode))
+            return res.status(400).send(errorResponse("Please validate your OTP!", res.statusCode))
         }
         const token = await user.generateAuthToken()
         await user.save()
