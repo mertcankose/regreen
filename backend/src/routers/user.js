@@ -106,7 +106,7 @@ const upload = multer({
     }
 });
 
-router.post('/user/avatar/:id', auth, (req, res, next) => {
+router.post('/user/avatar', auth, (req, res, next) => {
     upload.single('avatar')(req, res, (err) => {
         if (err) {
             return res.status(err.statusCode || 400).send(errorResponse(err.message, res.statusCode));
@@ -121,7 +121,7 @@ router.post('/user/avatar/:id', auth, (req, res, next) => {
         }
 
         const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer();
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.user._id);
         user.avatar = buffer;
         await user.save();
         res.status(200).send(successResponse('OK', {}, res.statusCode));
@@ -130,9 +130,9 @@ router.post('/user/avatar/:id', auth, (req, res, next) => {
     }
 });
 
-router.get('/user/avatar/:id', auth, async (req, res) => {
+router.get('/user/avatar', auth, async (req, res) => {
     try {
-        const user = await User.findById(req.params.id)
+        const user = await User.findById(req.user._id)
         res.set('Content-Type', 'image/png')
         return res.status(200).send(successResponse("OK", { avatar: user.avatar }, res.statusCode))
     } catch (error) {
@@ -140,7 +140,7 @@ router.get('/user/avatar/:id', auth, async (req, res) => {
     }
 })
 
-router.delete('/user/avatar/:id', auth, async (req, res) => {
+router.delete('/user/avatar', auth, async (req, res) => {
     try {
         const user = await User.findById(req.user._id)
         user.avatar = null
