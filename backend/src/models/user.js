@@ -30,7 +30,13 @@ const userSchema = new mongoose.Schema({
         minlength: 8,
         validate(value) {
             if (value.toLowerCase().includes('password')) {
-                throw new Error('Password can\'t contain "password"')
+                throw new Error('Password can\'t contain "password"');
+            }
+            if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) {
+                throw new Error('Password must contain at least one special character');
+            }
+            if (value.length < 8) {
+                throw new Error('Password must be at least 8 characters long');
             }
         },
         trim: true
@@ -38,6 +44,18 @@ const userSchema = new mongoose.Schema({
     avatar: {
         type: Buffer,
         default: null,
+    },
+    otp: {
+        type: String,
+        default: null,
+    },
+    otpExpiration: {
+        type: Date,
+        default: null,
+    },
+    active: {
+        type: Boolean,
+        default: false,
     },
     tokens: [{
         token: {

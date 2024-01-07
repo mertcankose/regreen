@@ -6,10 +6,15 @@ const { successResponse, errorResponse } = require("../utils/response")
 const bycrypt = require('bcryptjs')
 const multer = require('multer')
 const sharp = require('sharp')
+const { generateOTP } = require('../utils/otp')
 
 router.post('/user/register', async (req, res) => {
+    const otpGenerated = generateOTP();
+    const otpExpiration = new Date(Date.now() + 2 * 60 * 1000);
     const user = new User({
         ...req.body,
+        otp: otpGenerated,
+        otpExpiration: otpExpiration,
     })
     try {
         const token = await user.generateAuthToken()
@@ -23,6 +28,9 @@ router.post('/user/register', async (req, res) => {
 router.post('/user/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
+        if (!user.active) {
+            res.status(400).send(errorResponse("Please validate your OTP!", res.statusCode))
+        }
         const token = await user.generateAuthToken()
         await user.save()
         res.send(successResponse("OK", { user, token }, res.statusCode))
@@ -66,7 +74,6 @@ router.post('/user/me', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = [
         'username',
-        'email'
     ]
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
@@ -159,6 +166,73 @@ router.post('/user/change-password', auth, async (req, res) => {
         res.send(successResponse("OK", {}, res.statusCode));
     } catch (error) {
         res.status(500).send(errorResponse(error.toString(), res.statusCode));
+    }
+});
+
+router.post('/user/change-email', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const { password, email } = req.body;
+
+        const isMatch = await bycrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).send(errorResponse("Password is'nt correct!", res.statusCode));
+        }
+
+        user.email = email;
+        await user.save();
+
+        res.send(successResponse("OK", {}, res.statusCode));
+    } catch (error) {
+        res.status(500).send(errorResponse(error.toString(), res.statusCode));
+    }
+});
+
+router.post('/user/send-otp-code-again', async (req, res) => {
+    const otpGenerated = generateOTP();
+    const otpExpiration = new Date(Date.now() + 2 * 60 * 1000);
+    try {
+        const user = await User.findOne({
+            email: req.body.email,
+        });
+
+        if (!user) {
+            return res.status(400).send(errorResponse("User not found.", res.statusCode))
+        }
+        user.otp = otpGenerated
+        user.otpExpiration = otpExpiration
+
+        await user.save()
+        res.status(200).send(successResponse("OK", { otp: user.otp }, res.statusCode))
+    } catch (error) {
+        res.status(400).send(errorResponse(error.toString(), res.statusCode))
+    }
+})
+
+router.post('/user/validate-otp', async (req, res) => {
+    try {
+        const user = await User.findOne({
+            email: req.body.email,
+        });
+
+        if (!user) {
+            return res.status(400).send(errorResponse("User not found!", res.statusCode));
+        }
+
+        if (user.otpExpiration && user.otpExpiration < new Date()) {
+            return res.status(400).send(errorResponse("OTP has expired!", res.statusCode));
+        }
+
+        if (user && user.otp !== req.body.otp) {
+            return res.status(400).send(errorResponse("Invalid OTP!", res.statusCode));
+        }
+
+        user.active = true;
+        const token = await user.generateAuthToken();
+        await user.save();
+        res.status(200).send(successResponse("OK", { user, token }, res.statusCode));
+    } catch (error) {
+        res.status(400).send(errorResponse(error.toString(), res.statusCode));
     }
 });
 
