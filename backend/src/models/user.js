@@ -110,6 +110,11 @@ userSchema.statics.findByCredentials = async (email, password) => {
     return user
 }
 
+userSchema.methods.clearOTP = function () {
+    this.otp = null;
+    this.otpExpiration = null;
+};
+
 userSchema.pre('save', async function (next) {
     //this means this user.
     const user = this

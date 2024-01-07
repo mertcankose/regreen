@@ -32,6 +32,9 @@ router.post('/user/login', async (req, res) => {
         if (!user.active) {
             return res.status(400).send(errorResponse("Please validate your OTP!", res.statusCode))
         }
+
+        user.clearOTP();
+
         const token = await user.generateAuthToken()
         await user.save()
         res.send(successResponse("OK", { user, token }, res.statusCode))
@@ -242,5 +245,62 @@ router.post('/user/validate-otp', async (req, res) => {
     }
 });
 
+router.post('/user/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).send(errorResponse("User not found.", res.statusCode));
+        }
+
+        const otpGenerated = generateOTP();
+        const otpExpiration = new Date(Date.now() + 2 * 60 * 1000);
+
+        user.otp = otpGenerated;
+        user.otpExpiration = otpExpiration;
+        await user.save();
+
+        const toEmail = user.email;
+        const emailSubject = `Password Reset OTP`;
+        const emailText = `Your OTP Code for ReGreen Password Reset: ${otpGenerated}`;
+        sendEmail(toEmail, emailSubject, emailText);
+
+        res.status(200).send(successResponse("OK", { otp: user.otp }, res.statusCode));
+    } catch (error) {
+        res.status(400).send(errorResponse(error.toString(), res.statusCode));
+    }
+});
+
+router.post('/user/reset-password', async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).send(errorResponse("User not found.", res.statusCode));
+        }
+
+        if (user.otpExpiration && user.otpExpiration < new Date()) {
+            return res.status(400).send(errorResponse("OTP has expired!", res.statusCode));
+        }
+
+        if (user.otp !== otp) {
+            return res.status(400).send(errorResponse("Invalid OTP!", res.statusCode));
+        }
+
+        // Update password and clear OTP fields
+        user.password = newPassword;
+        user.otp = null;
+        user.otpExpiration = null;
+
+        await user.save();
+
+        const token = await user.generateAuthToken();
+        res.status(200).send(successResponse("OK", { user, token }, res.statusCode));
+    } catch (error) {
+        res.status(400).send(errorResponse(error.toString(), res.statusCode));
+    }
+});
 
 module.exports = router
