@@ -9,7 +9,15 @@ const multer = require('multer')
 const sharp = require('sharp')
 const { generateOTP } = require('../utils/otp')
 const { sendEmail } = require('../utils/mail_send')
+const nodemailer = require('nodemailer');
 
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.USER_MAIL,
+        pass: process.env.USER_PASS
+    }
+});
 router.post('/user/register', async (req, res) => {
     const otpGenerated = generateOTP();
     const otpExpiration = new Date(Date.now() + 2 * 60 * 1000);
@@ -203,7 +211,13 @@ router.post('/user/send-otp-code', async (req, res) => {
         const toEmail = req.body.email;
         const emailSubject = `OTP Verification`;
         const emailText = `Your OTP Code for ReGreen: ${otpGenerated}`;
-        sendEmail(toEmail, emailSubject, emailText);
+        const mailOptions = {
+            from: `ReGreen Project <${process.env.USER_MAIL}>`,
+            to: toEmail,
+            subject: emailSubject,
+            text: emailText
+        };
+        const info = await transporter.sendMail(mailOptions);
         otpObject.save();
         res.status(200).send(successResponse("OK", { otp: otpGenerated }, res.statusCode))
     } catch (error) {
@@ -229,8 +243,13 @@ router.post('/user/send-otp-code-again', async (req, res) => {
         const toEmail = req.body.email;
         const emailSubject = `OTP Verification`;
         const emailText = `Your OTP Code for ReGreen: ${otpGenerated}`;
-        sendEmail(toEmail, emailSubject, emailText);
-
+        const mailOptions = {
+            from: `ReGreen Project <${process.env.USER_MAIL}>`,
+            to: toEmail,
+            subject: emailSubject,
+            text: emailText
+        };
+        const info = await transporter.sendMail(mailOptions);
         res.status(200).send(successResponse("OK", { otp: user.otp }, res.statusCode))
     } catch (error) {
         res.status(400).send(errorResponse(error.toString(), res.statusCode))
@@ -276,7 +295,13 @@ router.post('/user/forgot-password', async (req, res) => {
         const toEmail = user.email;
         const emailSubject = `Password Reset OTP`;
         const emailText = `Your OTP Code for ReGreen Password Reset: ${otpGenerated}`;
-        sendEmail(toEmail, emailSubject, emailText);
+        const mailOptions = {
+            from: `ReGreen Project <${process.env.USER_MAIL}>`,
+            to: toEmail,
+            subject: emailSubject,
+            text: emailText
+        };
+        const info = await transporter.sendMail(mailOptions);
 
         res.status(200).send(successResponse("OK", { otp: user.otp }, res.statusCode));
     } catch (error) {
