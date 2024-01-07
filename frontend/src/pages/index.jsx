@@ -1,0 +1,12 @@
+export { default as About } from "./About";
+export { default as Contact } from "./Contact";
+export { default as Home } from "./Home";
+export { default as Messages } from "./Messages";
+export { default as Notifications } from "./Notifications";
+export { default as Profile } from "./Profile";
+export { default as Projects } from "./Projects";
+export { default as Feed } from "./Feed";
+export { default as Login } from "./Login";
+export { default as Register } from "./Register";
+export { default as Unauthorized } from "./Unauthorized";
+export { default as NotFound } from "./NotFound";

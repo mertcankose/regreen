@@ -1,0 +1,24 @@
+.menu {
+
+}
+
+.menuItem {
+    @apply
+    text-lightGray text-sm lg:text-base
+}
+
+.childrenItem{
+    @apply
+    flex lg:hidden
+
+}
+
+.activeMenu {
+    @apply
+    text-primary font-semibold
+}
+
+.inactiveMenu {
+    @apply
+    border-b-0
+}

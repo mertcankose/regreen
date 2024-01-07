@@ -1,0 +1,85 @@
+.header {
+    @apply
+    sticky top-0 left-0 right-0 z-50 bg-primary bg-opacity-10
+ }
+ 
+ .innerHeader {
+     @apply mx-auto
+     h-[74px] xl:h-[84px] 2xl:h-[96px]
+     w-full max-w-7xl
+     relative
+ }
+ 
+ .logoDesktop {
+     @apply
+     hidden lg:flex
+ }
+ 
+ .logoMobile {
+     @apply
+     flex lg:hidden w-36 md:w-full
+ }
+ 
+ .desktopContainer {
+     @apply
+     hidden lg:flex flex-row justify-between items-center
+   h-full px-4 xl:px-2 
+ }
+ 
+ .desktopMenuContainer {
+     @apply
+     flex-1
+     hidden lg:flex items-center justify-center 
+     md:gap-[28px] lg:gap-[36px] xl:gap-[50px] 
+     h-full
+ }
+ 
+ .mobileContainer {
+     @apply
+     flex lg:hidden justify-between items-center
+     px-4 xl:px-0 h-full
+ }
+ 
+ .mobileMenuContainer {
+     @apply
+     bg-gray-100 flex lg:hidden
+     absolute top-[100%] left-0 right-0 mt-4 py-10 rounded-lg z-50 w-4/5 mx-auto flex-col items-center gap-6
+     transition-all duration-300 ease-in-out
+ }
+ 
+ .connectWalletDesktop {
+     @apply
+     hidden lg:flex
+ }
+ 
+ .connectWalletMobile {
+     @apply
+     flex lg:hidden
+ }
+ 
+ .whitepaperDesktop {
+     @apply
+     hidden lg:flex
+ }
+ 
+ .whitepaperMobile {
+     @apply
+     flex lg:hidden
+ }
+ 
+ .hamburgerButton {
+     @apply
+    block lg:hidden text-black w-12 h-12 relative focus:outline-none bg-transparent
+ }
+ 
+ .hamburgerInnerContainer {
+     @apply
+     block w-6 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2
+ }
+ 
+ .hamburgerLine {
+     @apply
+     block absolute h-0.5 w-5 bg-current transform transition duration-500 ease-in-out
+ }
+ 
+ 

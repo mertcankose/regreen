@@ -1,0 +1,17 @@
+.footer {
+    @apply
+    flex flex-col justify-center border
+    /* h-80 */
+}
+
+.copyrightContainer {
+    @apply
+    py-6 bg-primary
+}
+
+.copyrightText {
+    @apply
+    text-gray-700 text-lg md:text-xl text-center
+}
+
+
