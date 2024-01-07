@@ -9,6 +9,7 @@ const Home = () => {
         <p className=" text-5xl">
           <span className="text-primary">ReGreen</span> makes sustainable living fun and accessible.
         </p>
+
         <p className="mt-6 text-darkGray text-lg mb-3">Join us for free to experience a sustainable world!</p>
         <Link to="/login" className="bg-primary w-[146px] h-12 flex justify-center items-center rounded text-white font-semibold">
           Login

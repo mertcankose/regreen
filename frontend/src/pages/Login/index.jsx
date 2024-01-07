@@ -83,9 +83,14 @@ const Login = () => {
           </div>
 
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-1" htmlFor="password">
-              Password
-            </label>
+            <div className="flex justify-between mb-1">
+              <label className="block text-gray-700 text-sm font-bold" htmlFor="password">
+                Password
+              </label>
+              <Link to="/forgot-password" className="inline-block text-primary align-baseline font-bold text-sm" href="/forgot">
+                Forgot Password
+              </Link>
+            </div>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="password"
@@ -108,6 +113,7 @@ const Login = () => {
               Login
             </button>
             {showError && <p className="text-red-500 text-xs italic mt-2">Please fill in all fields</p>}
+
             <Link to="/register" className="inline-block text-lightGray align-baseline mt-4 font-bold text-sm" href="/register">
               Don't have an account? <span className="text-primary">Register</span>
             </Link>
