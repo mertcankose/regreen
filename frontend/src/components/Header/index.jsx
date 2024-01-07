@@ -47,10 +47,10 @@ const Header = () => {
           {/* <ConnectWallet className={styles.connectWalletDesktop} /> */}
           <Button
             onClick={() => {
-              navigate("/contact");
+              navigate("/feed");
             }}
           >
-            Get in touch
+            GO FEED
           </Button>
         </div>
         <div className={styles.mobileContainer}>
