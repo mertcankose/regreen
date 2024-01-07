@@ -191,6 +191,20 @@ router.post('/user/change-email', auth, async (req, res) => {
         res.status(500).send(errorResponse(error.toString(), res.statusCode));
     }
 });
+router.post('/user/send-otp-code', async (req, res) => {
+    const otpGenerated = generateOTP();
+    const otpExpiration = new Date(Date.now() + 2 * 60 * 1000);
+    try {
+        const toEmail = req.body.email;
+        const emailSubject = `OTP Verification`;
+        const emailText = `Your OTP Code for ReGreen: ${otpGenerated}`;
+        sendEmail(toEmail, emailSubject, emailText);
+
+        res.status(200).send(successResponse("OK", { otp: otpGenerated }, res.statusCode))
+    } catch (error) {
+        res.status(400).send(errorResponse(error.toString(), res.statusCode))
+    }
+})
 
 router.post('/user/send-otp-code-again', async (req, res) => {
     const otpGenerated = generateOTP();
