@@ -7,6 +7,7 @@ const bycrypt = require('bcryptjs')
 const multer = require('multer')
 const sharp = require('sharp')
 const { generateOTP } = require('../utils/otp')
+const { sendEmail } = require('../utils/mail_send')
 
 router.post('/user/register', async (req, res) => {
     const otpGenerated = generateOTP();
@@ -201,8 +202,13 @@ router.post('/user/send-otp-code-again', async (req, res) => {
         }
         user.otp = otpGenerated
         user.otpExpiration = otpExpiration
-
         await user.save()
+
+        const toEmail = req.body.email;
+        const emailSubject = `OTP Verification`;
+        const emailText = 'Your OTP Code for ReGreen: ${otpGenerated}';
+        sendEmail(toEmail, emailSubject, emailText);
+
         res.status(200).send(successResponse("OK", { otp: user.otp }, res.statusCode))
     } catch (error) {
         res.status(400).send(errorResponse(error.toString(), res.statusCode))
