@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 const sendEmail = async (to, subject, text) => {
     try {
         const mailOptions = {
-            from: 'regreen.app@gmail.com',
+            from: `ReGreen Project <${process.env.USER_MAIL}>`,
             to: to,
             subject: subject,
             text: text
